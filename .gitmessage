@@ -1,0 +1,10 @@
+# <type>[(scope)][!]: <description>
+#
+# [optional body — wrap at 72 cols, separated from subject by a blank line]
+#
+# [optional footers — Refs:, BREAKING CHANGE:, Co-authored-by: …]
+#
+# Allowed types: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert.
+# - Subject: imperative, lowercase, ≤72 chars, no trailing period.
+# - Breaking change: append `!` before `:` AND add a `BREAKING CHANGE:` footer.
+# - See docs/specs/practices/conventional-commits.md (ADR-007).

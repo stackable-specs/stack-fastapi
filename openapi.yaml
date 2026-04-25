@@ -1,0 +1,149 @@
+# Hand-authored OpenAPI Description (OpenAPI rule 3: design-first).
+# `make openapi-export` regenerates `openapi.generated.json` from the live FastAPI
+# app; CI runs `oasdiff` between this file and the generated artifact and fails
+# on breaking drift (OpenAPI rules 5, 6, fastapi rule 17).
+openapi: 3.1.0
+info:
+  title: python-uv reference API
+  version: 0.1.0
+  description: |
+    Reference HTTP surface for the python-uv stack. Every operation is
+    documented per OpenAPI rules 9–18 and uses RFC 9457 Problem Details for
+    error responses.
+servers:
+  - url: http://localhost:8000
+    description: Local development (Docker Compose)
+tags:
+  - name: Health
+    description: Liveness and readiness probes.
+  - name: Greetings
+    description: Example domain endpoints.
+paths:
+  /health:
+    get:
+      operationId: get-health
+      tags: [Health]
+      summary: Liveness probe
+      description: Returns 200 while the process is up.
+      responses:
+        "200":
+          description: Process is up.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+              examples:
+                up:
+                  value: { status: ok }
+  /ready:
+    get:
+      operationId: get-ready
+      tags: [Health]
+      summary: Readiness probe
+      description: Exercises downstream dependencies and reports readiness.
+      responses:
+        "200":
+          description: Service is ready to accept traffic.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReadinessStatus"
+              examples:
+                ready:
+                  value:
+                    status: ready
+                    dependencies: { database: ok }
+        "503":
+          description: At least one downstream dependency is unavailable.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+  /v1/greetings:
+    post:
+      operationId: create-greeting
+      tags: [Greetings]
+      summary: Create a greeting
+      description: Build a greeting message for the provided name.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GreetingRequest"
+            examples:
+              ada:
+                value: { name: Ada }
+      responses:
+        "201":
+          description: Greeting created.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GreetingResponse"
+              examples:
+                ada:
+                  value: { message: "Hello, Ada!" }
+        "422":
+          description: Request validation failed.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [ok]
+    ReadinessStatus:
+      type: object
+      required: [status, dependencies]
+      properties:
+        status:
+          type: string
+          enum: [ready, not_ready]
+        dependencies:
+          type: object
+          additionalProperties:
+            type: string
+            enum: [ok, down]
+    GreetingRequest:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+    GreetingResponse:
+      type: object
+      required: [message]
+      properties:
+        message:
+          type: string
+    ProblemDetails:
+      description: RFC 9457 Problem Details for HTTP APIs.
+      type: object
+      required: [title, status]
+      properties:
+        type:
+          type: string
+          format: uri-reference
+          default: about:blank
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+        instance:
+          type: string
+          format: uri-reference
+        errors:
+          type: array
+          items:
+            type: object

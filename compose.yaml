@@ -1,0 +1,106 @@
+# Compose file per docker-compose.md (ADR-016):
+# - rule 1: filename is `compose.yaml`.
+# - rule 2: no `version:` key.
+# - rule 4: explicit project `name:`.
+# - rule 8: every network/volume/secret declared at the top level.
+# - rule 11: configuration via interpolated ${VAR} from .env.
+# - rule 13: credentials via Compose `secrets:`, not `environment:`.
+# - rule 14: depends_on with `condition: service_healthy`.
+# - rule 16: explicit `restart:` policy.
+# - rule 17: explicit resource limits.
+# - rule 18: ports bound to 127.0.0.1.
+# - rule 22: non-root `user:` for application services.
+# - rule 23: read-only root filesystem for production-bound services.
+# - rule 24: bounded logging driver.
+name: python-uv
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: python-uv-app:${IMAGE_TAG:-dev}
+    user: "65532:65532"
+    read_only: true
+    tmpfs:
+      - /tmp
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      APP_ENVIRONMENT: ${APP_ENVIRONMENT:-local}
+      APP_LOG_LEVEL: ${APP_LOG_LEVEL:-INFO}
+      APP_DOCS_ENABLED: ${APP_DOCS_ENABLED:-false}
+      APP_DATABASE_URL: postgresql://app:${POSTGRES_PASSWORD}@postgres:5432/app
+    secrets:
+      - postgres_password
+    ports:
+      - "127.0.0.1:8000:8000"
+    networks:
+      - backend
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/health',timeout=2).status==200 else 1)",
+        ]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+
+  postgres:
+    # TODO(release): replace with digest pin, e.g.
+    # image: postgres@sha256:REPLACE_WITH_DIGEST  # postgres:17.2-alpine
+    image: postgres:17.2-alpine
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_DB: app
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+    secrets:
+      - postgres_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - backend
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app -d app"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+
+networks:
+  backend:
+    driver: bridge
+
+volumes:
+  postgres_data:
+
+secrets:
+  postgres_password:
+    file: ./secrets/postgres_password

@@ -1,0 +1,45 @@
+# prek (ADR-018, docs/specs/quality/prek.md). prek owns pre-commit / pre-push /
+# commit-msg git hooks; Trunk Code Quality (ADR-012) is invoked as a local hook
+# from here so a single runner orchestrates the gate (prek rule 16).
+#
+# Pin every remote rev to a tag (rule 3). Language-native tools (ruff, mypy)
+# run through `uv run` against uv.lock so the lockfile stays the single source
+# of truth for their versions (rule 8). Conventional Commits enforcement runs
+# as a commit-msg hook (rule 17).
+
+[[repos]]
+repo = "https://github.com/pre-commit/pre-commit-hooks"
+rev = "v5.0.0"
+hooks = [
+    # rule 7 — baseline file hygiene
+    { id = "trailing-whitespace", stages = ["pre-commit"] },
+    { id = "end-of-file-fixer", stages = ["pre-commit"] },
+    { id = "check-yaml", stages = ["pre-commit"], args = ["--allow-multiple-documents"] },
+    { id = "check-json", stages = ["pre-commit"] },
+    { id = "check-toml", stages = ["pre-commit"] },
+    { id = "check-merge-conflict", stages = ["pre-commit"] },
+    { id = "check-added-large-files", stages = ["pre-commit"], args = ["--maxkb=512"] },
+]
+
+[[repos]]
+repo = "https://github.com/gitleaks/gitleaks"
+rev = "v8.21.2"
+# rule 6 — secret detection on every commit
+hooks = [{ id = "gitleaks", stages = ["pre-commit"] }]
+
+[[repos]]
+repo = "local"
+hooks = [
+    # rule 8 — language-native lint pinned by uv.lock
+    { id = "ruff-check", name = "ruff check (uv.lock)", entry = "uv run ruff check", language = "system", types = ["python"], stages = ["pre-commit"] },
+    { id = "ruff-format", name = "ruff format (uv.lock)", entry = "uv run ruff format --check", language = "system", types = ["python"], stages = ["pre-commit"] },
+    # rule 8 — language-native typecheck pinned by uv.lock
+    { id = "mypy", name = "mypy (uv.lock)", entry = "uv run mypy", language = "system", types = ["python"], pass_filenames = false, stages = ["pre-push"] },
+    # ADR-012 — Trunk runs as a hook, not as the hook driver
+    { id = "trunk-check", name = "trunk check (changed files)", entry = "trunk check", language = "system", pass_filenames = false, stages = ["pre-commit"] },
+    { id = "trunk-fmt", name = "trunk fmt (changed files)", entry = "trunk fmt", language = "system", pass_filenames = false, stages = ["pre-commit"] },
+    # ADR-018 — wheel build runs pre-push so packaging breakage cannot reach CI
+    { id = "wheel-build", name = "uv build (wheel + sdist)", entry = "uv build", language = "system", pass_filenames = false, stages = ["pre-push"] },
+    # ADR-007 / rule 17 — Conventional Commits enforcement at commit-msg
+    { id = "commitlint", name = "commitlint (Conventional Commits)", entry = "npx --no -- commitlint --edit", language = "system", pass_filenames = false, stages = ["commit-msg"] },
+]

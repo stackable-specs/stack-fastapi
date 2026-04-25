@@ -1,0 +1,46 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+
+# uv-managed virtualenv (ADR-002, uv rule 17)
+.venv/
+
+# Trunk cache (ADR-012, trunk-code-quality rule 13)
+.trunk/out/
+.trunk/logs/
+.trunk/actions/
+
+# prek hook environment cache (ADR-018, prek rule 13)
+.prek-cache/
+
+# pdoc generated output (ADR-017, pdoc rule 5)
+docs-site/
+
+# Environment files (ADR-016, docker-compose rule 12)
+.env
+.env.*
+!.env.example
+
+# Local Compose secrets (ADR-016, docker-compose rule 13)
+secrets/*
+!secrets/.gitkeep
+!secrets/README.md
+
+# IDE / editor
+.idea/
+.vscode/
+*.swp
+.DS_Store
+.hypothesis

@@ -1,0 +1,36 @@
+# docker rule 10: keep secrets, VCS, caches, and tests out of the build context
+.git/
+.github/
+.trunk/
+.venv/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+__pycache__/
+*.pyc
+*.pyo
+
+# tests, docs, dev tooling
+tests/
+docs/
+docs-site/
+*.md
+!README.md
+
+# build outputs
+dist/
+build/
+htmlcov/
+coverage.xml
+.coverage
+.coverage.*
+
+# environment / local config — never copy into an image (docker rule 11)
+.env
+.env.*
+.envrc
+
+# editor / OS noise
+.idea/
+.vscode/
+.DS_Store

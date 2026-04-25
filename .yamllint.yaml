@@ -1,0 +1,23 @@
+# yamllint config for the python-uv stack.
+extends: default
+rules:
+  line-length:
+    max: 200
+    allow-non-breakable-inline-mappings: true
+    allow-non-breakable-words: true
+  document-start: disable
+  truthy:
+    check-keys: false
+  comments:
+    min-spaces-from-content: 1
+  braces:
+    min-spaces-inside: 0
+    max-spaces-inside: 1
+  brackets:
+    min-spaces-inside: 0
+    max-spaces-inside: 1
+ignore: |
+  .venv/
+  .trunk/out/
+  uv.lock
+  docs-site/

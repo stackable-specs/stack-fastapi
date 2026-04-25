@@ -1,0 +1,22 @@
+# dependency-management rule 11: dependency changes require a reviewer who owns
+# dependency policy. Replace placeholder team handles with the real owners.
+
+# Default ownership
+*                                       @python-uv-stack/maintainers
+
+# Dependency surface — gated owner
+/pyproject.toml                         @python-uv-stack/dependency-policy
+/uv.lock                                @python-uv-stack/dependency-policy
+/Dockerfile                             @python-uv-stack/dependency-policy @python-uv-stack/platform
+/compose.yaml                           @python-uv-stack/platform
+/compose.override.yaml                  @python-uv-stack/platform
+/renovate.json                          @python-uv-stack/dependency-policy
+
+# Decision and behavior records
+/docs/adr/                              @python-uv-stack/architects
+/docs/bdr/                              @python-uv-stack/product
+/docs/specs/                            @python-uv-stack/architects
+
+# Security-sensitive surface
+/.github/workflows/                     @python-uv-stack/security
+/.trunk/                                @python-uv-stack/security
