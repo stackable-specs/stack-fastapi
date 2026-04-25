@@ -1,0 +1,46 @@
+name: prek auto-update
+
+# ADR-018 / prek rule 12 — scheduled `prek auto-update --check` PR so pinned
+# hook revs do not drift unmaintained.
+
+on:
+  schedule:
+    - cron: "0 6 * * 1" # Mondays 06:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+env:
+  UV_VERSION: "0.5.11"
+  PYTHON_VERSION: "3.12"
+
+jobs:
+  autoupdate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v4
+        with:
+          version: ${{ env.UV_VERSION }}
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
+      - run: uv python install ${{ env.PYTHON_VERSION }}
+      - name: Install pinned prek
+        run: uv tool install prek==0.0.6
+      - name: Run prek auto-update
+        run: uv tool run prek auto-update
+      - name: Open PR with hook upgrades
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: chore/prek-autoupdate
+          title: "chore(prek): auto-update hook revisions"
+          body: |
+            Automated `prek auto-update` run.
+
+            Per ADR-018 and `docs/specs/quality/prek.md` rule 12, hook `rev:`
+            pins are refreshed on a weekly cadence. Review the diff against
+            the upstream changelogs before merging.
+          commit-message: "chore(prek): auto-update hook revisions"
+          labels: dependencies,prek
