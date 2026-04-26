@@ -25,11 +25,18 @@ else
 	check_fail "CI emits an SBOM artifact" "no anchore/sbom-action or cyclonedx step"
 fi
 
-if grep -q 'sbom: true' .github/workflows/ci.yml 2>/dev/null; then
-	check_pass "docker build-push-action requests sbom: true"
+# sbom rule 5 (distribute SBOM alongside the artifact) is satisfied either
+# by build-push-action's inline `sbom: true` OR by a dedicated SBOM step
+# (anchore/sbom-action / cyclonedx). The inline form is incompatible with
+# `load: true` because it forces a multi-arch manifest the local docker
+# daemon can't import — when `load: true` is in use, the dedicated step
+# is the right path.
+if grep -q 'sbom: true' .github/workflows/ci.yml 2>/dev/null ||
+	grep -q 'anchore/sbom-action' .github/workflows/ci.yml 2>/dev/null; then
+	check_pass "SBOM attached to the build (inline or dedicated step)"
 else
-	check_fail "docker build-push-action requests sbom: true" \
-		"image build does not attach SBOM (sbom rule 5)"
+	check_fail "SBOM attached to the build (inline or dedicated step)" \
+		"sbom rule 5 unmet"
 fi
 
 if grep -q 'upload-artifact' .github/workflows/ci.yml 2>/dev/null &&

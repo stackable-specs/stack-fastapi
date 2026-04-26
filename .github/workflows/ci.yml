@@ -188,13 +188,15 @@ jobs:
           file: ./Dockerfile
           push: false
           load: true
-          # docker `load:` cannot accept multi-arch manifest lists — pin a
-          # single platform so the runner's daemon can import the image
-          # for the Trivy scan that follows.
+          # docker `load:` cannot accept the multi-arch manifest list that
+          # build-kit produces when provenance/sbom attestations are enabled.
+          # The dedicated `anchore/sbom-action` step below ships the SBOM
+          # for ADR-013 (sbom rule 5) — keep this build step single-platform
+          # and attestation-free so Trivy can scan the loaded image.
           platforms: linux/amd64
           tags: python-uv-app:${{ github.sha }}
-          provenance: true
-          sbom: true
+          provenance: false
+          sbom: false
       - name: Generate CycloneDX SBOM for the build context
         uses: anchore/sbom-action@v0
         with:
