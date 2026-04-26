@@ -188,6 +188,10 @@ jobs:
           file: ./Dockerfile
           push: false
           load: true
+          # docker `load:` cannot accept multi-arch manifest lists — pin a
+          # single platform so the runner's daemon can import the image
+          # for the Trivy scan that follows.
+          platforms: linux/amd64
           tags: python-uv-app:${{ github.sha }}
           provenance: true
           sbom: true
