@@ -232,6 +232,17 @@ jobs:
           cache-dependency-glob: "uv.lock"
       - run: uv python install ${{ env.PYTHON_VERSION }}
       - run: uv sync --locked --group test --group dev
+      - name: Seed Compose secrets (gitignored on disk)
+        # secrets/* are .gitignored (docker-compose rule 13); the CI runner
+        # creates throwaway local-dev values so the smoke topology starts.
+        # Production deploys would pull these from the secret manager.
+        run: |
+          mkdir -p secrets
+          openssl rand -base64 32 > secrets/postgres_password
+          printf 'Authorization=Basic %s\n' \
+            "$(printf 'root@example.com:changeme' | base64)" \
+            > secrets/openobserve_token
+          chmod 600 secrets/postgres_password secrets/openobserve_token
       - name: Start Compose topology
         run: |
           cp .env.example .env
