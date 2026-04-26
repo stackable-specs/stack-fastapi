@@ -17,16 +17,32 @@ coverage.xml
 # uv-managed virtualenv (ADR-002, uv rule 17)
 .venv/
 
-# Trunk cache (ADR-012, trunk-code-quality rule 13)
+# Trunk cache (ADR-012, trunk-code-quality rule 13). Trailing-slash patterns
+# catch real cache directories; the bare names catch the symlinks Trunk
+# creates into ~/.cache/trunk/... on first run, which would be broken on any
+# other machine if committed.
+.trunk/out
+.trunk/logs
+.trunk/actions
+.trunk/notifications
+.trunk/tools
 .trunk/out/
 .trunk/logs/
 .trunk/actions/
+.trunk/notifications/
+.trunk/tools/
 
 # prek hook environment cache (ADR-018, prek rule 13)
 .prek-cache/
 
 # pdoc generated output (ADR-017, pdoc rule 5)
 docs-site/
+
+# Generated SBOM (ADR-013, sbom rule 8 — canonical SBOM is the per-build CI
+# artifact published alongside the image, not a checked-in file).
+sbom.cdx.json
+*.cdx.json
+*.spdx.json
 
 # Environment files (ADR-016, docker-compose rule 12)
 .env

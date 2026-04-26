@@ -86,7 +86,7 @@ image: ## Build the production container image.
 
 .PHONY: sbom
 sbom: ## Generate a CycloneDX SBOM for the project (sbom rule 5).
-	uv run cyclonedx-py environment --output-file sbom.cdx.json
+	uv run cyclonedx-py environment --pyproject pyproject.toml --outfile sbom.cdx.json --of JSON
 
 .PHONY: up
 up: ## Start the local Compose topology (api + postgres).
