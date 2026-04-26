@@ -27,6 +27,7 @@ Reference implementation of the python-uv stack. Every artifact in this director
 | [ADR-019](docs/adr/019-adopt-smoke-testing-as-pipeline-gate.md) Smoke testing       | `tests/smoke/`, `make smoke`, CI `smoke` job, `.github/workflows/smoke-postdeploy.yml`   |
 | [ADR-020](docs/adr/020-adopt-opentelemetry-for-instrumentation.md) OpenTelemetry    | `src/app/observability.py`, `OTEL_*` env vars, `opentelemetry-*` deps                    |
 | [ADR-021](docs/adr/021-adopt-openobserve-as-otlp-backend.md) OpenObserve            | `compose.yaml` `openobserve` service, `docs/observability/`                              |
+| [ADR-022](docs/adr/022-adopt-renovate-config.md) Renovate config                    | `renovate.json`, CI `renovate-config` job, `docs/dependencies/renovate.md`               |
 
 ## Quickstart
 

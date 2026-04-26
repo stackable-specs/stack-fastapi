@@ -28,3 +28,4 @@ Format and lifecycle rules are defined in `specs/practices/madr.md`.
 | [ADR-019](019-adopt-smoke-testing-as-pipeline-gate.md) | Adopt Smoke Testing as a Pipeline Gate | Accepted |
 | [ADR-020](020-adopt-opentelemetry-for-instrumentation.md) | Adopt OpenTelemetry for Application Instrumentation | Accepted |
 | [ADR-021](021-adopt-openobserve-as-otlp-backend.md) | Adopt OpenObserve as the OTLP Backend | Accepted |
+| [ADR-022](022-adopt-renovate-config.md) | Adopt the Renovate Configuration Spec | Accepted |

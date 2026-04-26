@@ -25,6 +25,7 @@ adr-018-prek.sh
 adr-019-smoke-testing.sh
 adr-020-opentelemetry.sh
 adr-021-openobserve.sh
+adr-022-renovate.sh
 "
 
 failed=0
