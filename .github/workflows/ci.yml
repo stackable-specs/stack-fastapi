@@ -70,6 +70,11 @@ jobs:
       - name: Install pinned prek
         # ADR-018 / prek rule 2 — pin the CLI version on every CI run.
         run: uv tool install prek==0.3.10
+      - name: Install Trunk
+        # prek.toml has a local `trunk-check` hook that shells out to the
+        # Trunk binary; it must be on PATH or prek aborts with
+        # "No such file or directory".
+        uses: trunk-io/trunk-action/setup@v1
       - name: Cache prek hook envs
         # prek rule 13 — key on the config file.
         uses: actions/cache@v4
@@ -129,7 +134,9 @@ jobs:
       - name: Install Spectral
         run: npm install --no-save @stoplight/spectral-cli@6.15.0
       - name: Lint openapi.yaml
-        run: npx spectral lint openapi.yaml --fail-severity=warn
+        # Spectral 6.x requires an explicit ruleset; --ruleset .spectral.yaml
+        # picks up the committed file at the repo root.
+        run: npx spectral lint openapi.yaml --ruleset .spectral.yaml --fail-severity=warn
       - name: Install oasdiff
         run: |
           curl -fsSL https://github.com/Tufin/oasdiff/releases/download/v1.10.27/oasdiff_1.10.27_linux_amd64.tar.gz \

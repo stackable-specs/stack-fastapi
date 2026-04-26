@@ -1,0 +1,5 @@
+# Minimal Spectral ruleset for openapi.yaml (ADR-004, openapi rule 5).
+# Spectral 6.x requires an explicit ruleset reference and no longer
+# auto-applies a default. We extend the bundled `spectral:oas` ruleset
+# which carries the standard OpenAPI v3 lint rules.
+extends: ["spectral:oas"]
