@@ -1,0 +1,4 @@
+# Resolve `# shellcheck source=...` directives relative to the script's own
+# directory. Required for verify/*.sh which all source ./lib.sh.
+external-sources=true
+source-path=SCRIPTDIR
