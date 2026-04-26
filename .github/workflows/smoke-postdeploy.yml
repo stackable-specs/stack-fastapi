@@ -1,0 +1,58 @@
+name: Smoke (post-deploy)
+
+# ADR-019 / smoke-testing rule 5 — re-run the same smoke suite against
+# every deployed environment within minutes of the deploy completing.
+#
+# Trigger: manual (workflow_dispatch) until a deploy workflow exists; that
+# deploy workflow should call this via `workflow_call` with the env URL.
+
+on:
+  # checkov:skip=CKV_GHA_7: this workflow is a post-deploy smoke probe — its
+  # inputs parameterize which already-deployed environment to test against,
+  # not what to build. The build artifact comes from ci.yml; nothing here
+  # mutates it.
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: "Base URL of the deployed environment to smoke (e.g. https://api.staging.example.com)"
+        required: true
+        type: string
+      environment:
+        description: "Environment label for reporting"
+        required: true
+        type: choice
+        options: [staging, production]
+  workflow_call:
+    inputs:
+      base_url:
+        required: true
+        type: string
+      environment:
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+env:
+  UV_VERSION: "0.5.11"
+  PYTHON_VERSION: "3.12"
+
+jobs:
+  smoke:
+    name: Smoke ${{ inputs.environment }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 8 # rule 3
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v4
+        with:
+          version: ${{ env.UV_VERSION }}
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
+      - run: uv python install ${{ env.PYTHON_VERSION }}
+      - run: uv sync --locked --group test --group dev
+      - name: Run smoke tests against ${{ inputs.environment }}
+        env:
+          SMOKE_BASE_URL: ${{ inputs.base_url }}
+        run: uv run pytest tests/smoke -m smoke --timeout=300

@@ -23,6 +23,7 @@ test = [
     "pytest==8.3.4",
     "pytest-asyncio==0.24.0",
     "pytest-cov==6.0.0",
+    "pytest-timeout==2.3.1",
     "httpx==0.28.1",
     "hypothesis==6.122.3",
     "testcontainers[postgres]==4.9.0",
@@ -99,6 +100,7 @@ asyncio_default_fixture_loop_scope = "function"
 markers = [
     "integration: integration test that touches a real out-of-process dependency (deselect with '-m \"not integration\"')",
     "property: Hypothesis-driven property-based test",
+    "smoke: pipeline-gate smoke test against a deployed instance (ADR-019; deselect with '-m \"not smoke\"')",
 ]
 
 [tool.coverage.run]

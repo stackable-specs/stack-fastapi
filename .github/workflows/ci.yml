@@ -183,3 +183,44 @@ jobs:
           severity: CRITICAL,HIGH
           exit-code: "1"
           ignore-unfixed: true
+
+  smoke:
+    # ADR-019 / smoke-testing rules 1, 4, 6, 8 — pipeline-gate smoke run
+    # against the just-built image, started under Compose with a real
+    # Postgres. Stops the line on failure; this job blocks any deploy stage.
+    name: Smoke (built image via Compose)
+    runs-on: ubuntu-latest
+    needs: [build-image]
+    timeout-minutes: 8 # rule 3 — ceiling ≤ 5 min runtime + boot/teardown overhead
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v4
+        with:
+          version: ${{ env.UV_VERSION }}
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
+      - run: uv python install ${{ env.PYTHON_VERSION }}
+      - run: uv sync --locked --group test --group dev
+      - name: Start Compose topology
+        run: |
+          cp .env.example .env
+          docker compose up --build --detach
+      - name: Wait for app readiness
+        run: |
+          for _ in $(seq 1 30); do
+            if curl -fsS http://localhost:8000/health >/dev/null; then
+              echo "app ready"; exit 0
+            fi
+            sleep 2
+          done
+          echo "app did not become ready in 60s"; exit 1
+      - name: Run smoke tests
+        env:
+          SMOKE_BASE_URL: http://localhost:8000
+        run: uv run pytest tests/smoke -m smoke --timeout=300
+      - name: Capture compose logs on failure
+        if: failure()
+        run: docker compose logs --no-color
+      - name: Tear down
+        if: always()
+        run: docker compose down --volumes

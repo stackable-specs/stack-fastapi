@@ -25,3 +25,4 @@ Format and lifecycle rules are defined in `specs/practices/madr.md`.
 | [ADR-016](016-adopt-docker-compose-for-local-and-single-host.md) | Adopt Docker Compose for Local Dev and Single-Host Topology | Accepted |
 | [ADR-017](017-adopt-pdoc-for-api-reference-docs.md) | Adopt pdoc for API Reference Documentation | Accepted |
 | [ADR-018](018-adopt-prek-as-hook-runner.md) | Adopt prek as the Single Git-Hook Runner | Accepted |
+| [ADR-019](019-adopt-smoke-testing-as-pipeline-gate.md) | Adopt Smoke Testing as a Pipeline Gate | Accepted |

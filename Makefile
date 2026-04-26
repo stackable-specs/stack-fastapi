@@ -52,6 +52,10 @@ test: ## Run unit + property tests.
 test-integration: ## Run integration tests (requires Docker).
 	uv run pytest tests/integration -m integration
 
+.PHONY: smoke
+smoke: ## Run smoke tests against $SMOKE_BASE_URL (default http://localhost:8000) — ADR-019.
+	uv run pytest tests/smoke -m smoke --timeout=300
+
 .PHONY: check
 check: lint typecheck test docs-check ## Run the full local PR-mirror gate.
 
