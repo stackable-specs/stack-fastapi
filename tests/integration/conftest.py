@@ -31,4 +31,5 @@ def integration_settings(postgres: PostgresContainer) -> Settings:
         database_url=postgres.get_connection_url(),
         cors_allow_origins=(),
         docs_enabled=False,
+        otel_enabled=False,
     )

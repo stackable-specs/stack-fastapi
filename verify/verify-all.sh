@@ -23,6 +23,8 @@ adr-016-docker-compose.sh
 adr-017-pdoc.sh
 adr-018-prek.sh
 adr-019-smoke-testing.sh
+adr-020-opentelemetry.sh
+adr-021-openobserve.sh
 "
 
 failed=0

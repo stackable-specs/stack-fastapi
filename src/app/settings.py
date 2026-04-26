@@ -37,6 +37,13 @@ class Settings(BaseSettings):
     database_url: str = Field(default="postgresql://app:app@localhost:5432/app")
     cors_allow_origins: tuple[str, ...] = Field(default=())
     docs_enabled: bool = Field(default=False)
+    # ADR-020: OpenTelemetry is opt-in. Tests run with the default `False`
+    # so they don't open OTLP exporters or attach root-logger handlers.
+    # Compose / production deployments set `APP_OTEL_ENABLED=true`. Resource
+    # attributes (service.name, service.version, deployment.environment) come
+    # from `OTEL_SERVICE_NAME` and `OTEL_RESOURCE_ATTRIBUTES` env vars — not
+    # from this Settings object — to keep one source of truth (rule 4).
+    otel_enabled: bool = Field(default=False)
 
 
 @lru_cache(maxsize=1)

@@ -9,9 +9,11 @@ from __future__ import annotations
 import logging
 
 from fastapi import FastAPI
+from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 from starlette.middleware.cors import CORSMiddleware
 
 from app.errors import register_error_handlers
+from app.observability import init_telemetry, shutdown_telemetry
 from app.routers import greetings_router, health_router
 from app.settings import Settings, get_settings
 
@@ -33,6 +35,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     logging.basicConfig(level=resolved.log_level)
     logger.info("starting app", extra={"environment": resolved.environment})
 
+    # ADR-020: providers are created exactly once at process start
+    # (opentelemetry rule 8) and shut down on FastAPI shutdown (rule 18).
+    providers = init_telemetry(resolved)
+
     app = FastAPI(
         title="python-uv reference API",
         version="0.1.0",
@@ -52,6 +58,11 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     register_error_handlers(app)
     app.include_router(health_router)
     app.include_router(greetings_router)
+
+    # ADR-020: official instrumentation library (opentelemetry rule 7).
+    if resolved.otel_enabled:
+        FastAPIInstrumentor.instrument_app(app)
+        app.add_event_handler("shutdown", lambda: shutdown_telemetry(providers))
 
     return app
 

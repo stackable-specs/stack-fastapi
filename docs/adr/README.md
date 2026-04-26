@@ -26,3 +26,5 @@ Format and lifecycle rules are defined in `specs/practices/madr.md`.
 | [ADR-017](017-adopt-pdoc-for-api-reference-docs.md) | Adopt pdoc for API Reference Documentation | Accepted |
 | [ADR-018](018-adopt-prek-as-hook-runner.md) | Adopt prek as the Single Git-Hook Runner | Accepted |
 | [ADR-019](019-adopt-smoke-testing-as-pipeline-gate.md) | Adopt Smoke Testing as a Pipeline Gate | Accepted |
+| [ADR-020](020-adopt-opentelemetry-for-instrumentation.md) | Adopt OpenTelemetry for Application Instrumentation | Accepted |
+| [ADR-021](021-adopt-openobserve-as-otlp-backend.md) | Adopt OpenObserve as the OTLP Backend | Accepted |

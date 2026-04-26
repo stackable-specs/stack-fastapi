@@ -27,13 +27,36 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      openobserve:
+        # OpenObserve image is distroless (no sh/wget/curl available for an
+        # in-container healthcheck). Wait for the container to start; the OTel
+        # SDK absorbs initial export retries while OpenObserve finishes booting
+        # (opentelemetry rule 17).
+        condition: service_started
     environment:
       APP_ENVIRONMENT: ${APP_ENVIRONMENT:-local}
       APP_LOG_LEVEL: ${APP_LOG_LEVEL:-INFO}
       APP_DOCS_ENABLED: ${APP_DOCS_ENABLED:-false}
       APP_DATABASE_URL: postgresql://app:${POSTGRES_PASSWORD}@postgres:5432/app
+      # ADR-020 / opentelemetry rule 2 — SDK config via OTEL_* env vars.
+      OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT:-http://openobserve:5080/api/default}
+      OTEL_EXPORTER_OTLP_PROTOCOL: ${OTEL_EXPORTER_OTLP_PROTOCOL:-http/protobuf}
+      OTEL_TRACES_SAMPLER: ${OTEL_TRACES_SAMPLER:-parentbased_traceidratio}
+      OTEL_TRACES_SAMPLER_ARG: ${OTEL_TRACES_SAMPLER_ARG:-1.0}
+      OTEL_SERVICE_NAME: python-uv-app
+      OTEL_RESOURCE_ATTRIBUTES: service.version=${IMAGE_TAG:-dev},deployment.environment=${APP_ENVIRONMENT:-local}
+      # OTEL_EXPORTER_OTLP_HEADERS is NOT set here. The api reads
+      # /run/secrets/openobserve_token at startup and exports the variable
+      # before the OTel SDK initializes (no credentials in compose / git).
+      # In production, inject OTEL_EXPORTER_OTLP_HEADERS via the secret
+      # manager and the in-container secret file becomes a no-op.
+      # Tighter default for local dev so metric ingest is visible quickly.
+      OTEL_METRIC_EXPORT_INTERVAL: ${OTEL_METRIC_EXPORT_INTERVAL:-5000}
+      # ADR-020 / N1: telemetry is opt-in; production sets APP_OTEL_ENABLED=true.
+      APP_OTEL_ENABLED: ${APP_OTEL_ENABLED:-true}
     secrets:
       - postgres_password
+      - openobserve_token
     ports:
       - "127.0.0.1:8000:8000"
     networks:
@@ -94,13 +117,47 @@ services:
       retries: 10
       start_period: 5s
 
+  openobserve:
+    # ADR-021 — OTLP-native store for logs / metrics / traces queried with SQL.
+    # TODO(release): replace with digest pin.
+    image: openobserve/openobserve:v0.80.0
+    environment:
+      ZO_ROOT_USER_EMAIL: ${ZO_ROOT_USER_EMAIL:-root@example.com}
+      ZO_ROOT_USER_PASSWORD: ${ZO_ROOT_USER_PASSWORD:-changeme}
+      ZO_DATA_DIR: /data
+    volumes:
+      - openobserve_data:/data
+    ports:
+      # Host port is shifted off the OTLP-collector default (5080) so the
+      # stack can run alongside an existing OpenTelemetry collector or a
+      # second OpenObserve instance. Override via OPENOBSERVE_HOST_PORT in
+      # .env. Internal port stays 5080 (api → openobserve uses the docker
+      # network, not the host).
+      - "127.0.0.1:${OPENOBSERVE_HOST_PORT:-5180}:5080" # HTTP UI + OTLP/HTTP ingest
+    networks:
+      - backend
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+
 networks:
   backend:
     driver: bridge
 
 volumes:
   postgres_data:
+  openobserve_data:
 
 secrets:
   postgres_password:
     file: ./secrets/postgres_password
+  openobserve_token:
+    file: ./secrets/openobserve_token

@@ -20,6 +20,7 @@ def settings() -> Settings:
         database_url="postgresql://test:test@localhost:5432/test",
         cors_allow_origins=(),
         docs_enabled=False,
+        otel_enabled=False,
     )
 
 

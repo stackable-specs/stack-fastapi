@@ -12,6 +12,13 @@ dependencies = [
     "uvicorn[standard]==0.32.1",
     "pydantic==2.10.3",
     "pydantic-settings==2.6.1",
+    # ADR-020: OpenTelemetry instrumentation surface.
+    "opentelemetry-api==1.29.0",
+    "opentelemetry-sdk==1.29.0",
+    "opentelemetry-exporter-otlp==1.29.0",
+    "opentelemetry-instrumentation-fastapi==0.50b0",
+    "opentelemetry-instrumentation-logging==0.50b0",
+    "opentelemetry-instrumentation-psycopg==0.50b0",
 ]
 
 [dependency-groups]

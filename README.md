@@ -25,6 +25,8 @@ Reference implementation of the python-uv stack. Every artifact in this director
 | [ADR-017](docs/adr/017-adopt-pdoc-for-api-reference-docs.md) pdoc                   | `make docs`, CI `docs` job                                                               |
 | [ADR-018](docs/adr/018-adopt-prek-as-hook-runner.md) prek                           | `prek.toml`, `make prek-install`, CI `prek` job, `.github/workflows/prek-autoupdate.yml` |
 | [ADR-019](docs/adr/019-adopt-smoke-testing-as-pipeline-gate.md) Smoke testing       | `tests/smoke/`, `make smoke`, CI `smoke` job, `.github/workflows/smoke-postdeploy.yml`   |
+| [ADR-020](docs/adr/020-adopt-opentelemetry-for-instrumentation.md) OpenTelemetry    | `src/app/observability.py`, `OTEL_*` env vars, `opentelemetry-*` deps                    |
+| [ADR-021](docs/adr/021-adopt-openobserve-as-otlp-backend.md) OpenObserve            | `compose.yaml` `openobserve` service, `docs/observability/`                              |
 
 ## Quickstart
 
