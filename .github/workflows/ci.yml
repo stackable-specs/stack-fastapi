@@ -75,6 +75,11 @@ jobs:
         # Trunk binary; it must be on PATH or prek aborts with
         # "No such file or directory".
         uses: trunk-io/trunk-action/setup@v1
+      - name: Add Trunk to PATH
+        # The setup action exports TRUNK_PATH (full path to the binary)
+        # but doesn't add its directory to PATH; prek's hook calls `trunk`
+        # bare, so we add it here.
+        run: echo "$(dirname "$TRUNK_PATH")" >> "$GITHUB_PATH"
       - name: Cache prek hook envs
         # prek rule 13 — key on the config file.
         uses: actions/cache@v4

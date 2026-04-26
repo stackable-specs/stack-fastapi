@@ -10,6 +10,12 @@ info:
     Reference HTTP surface for the python-uv stack. Every operation is
     documented per OpenAPI rules 9–18 and uses RFC 9457 Problem Details for
     error responses.
+  contact:
+    name: python-uv stack maintainers
+    url: https://github.com/stackable-specs/stack-fastapi
+  license:
+    name: Proprietary
+    identifier: LicenseRef-Proprietary
 servers:
   - url: http://localhost:8000
     description: Local development (Docker Compose)
