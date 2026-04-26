@@ -4,7 +4,7 @@
 
 A layered-specs stack is a set of decisions and rules across nine layers. Verifying the stack means proving — on a clean checkout — that every layer's tooling resolves, every spec's gate runs, and the artifacts the stack ships actually start, accept traffic, and meet the contracts the BDRs and OAD declare.
 
-The procedure below is layer-shaped, not tool-shaped. Each gate is named after the layer question it answers; the concrete command for *this* stack is shown as an example. Run the same gates against any other stack by substituting the stack's chosen tools.
+The procedure below is layer-shaped, not tool-shaped. Each gate is named after the layer question it answers; the concrete command for _this_ stack is shown as an example. Run the same gates against any other stack by substituting the stack's chosen tools.
 
 ## When to run this SOP
 
@@ -14,27 +14,27 @@ The procedure below is layer-shaped, not tool-shaped. Each gate is named after t
 - Before cutting a release tag.
 - Whenever someone reports "the local setup is broken."
 
-The goal is to confirm every ADR-materialized artifact still works — not to debug a specific failure. If a step fails, follow *Known failure modes* to diagnose, then re-run from the failing step.
+The goal is to confirm every ADR-materialized artifact still works — not to debug a specific failure. If a step fails, follow _Known failure modes_ to diagnose, then re-run from the failing step.
 
 ## Prerequisites
 
 Read the stack's [`docs/adr/README.md`](../adr/README.md) and the layered specs it cites; the prerequisite tools fall out of the language, platform, delivery, and quality layers.
 
-For *this* stack (python-uv):
+For _this_ stack (python-uv):
 
-| Tool | Version | Layer / spec |
-| --- | --- | --- |
-| uv | ≥ 0.4.27 | platform/uv (PEP 735 `[dependency-groups]` support; older uv silently drops them) |
-| Python | matches `.python-version` | language/python |
-| Docker | 23+ (BuildKit) | delivery/docker, delivery/docker-compose, quality/integration-testing |
-| Trunk CLI | as pinned in `.trunk/trunk.yaml` | quality/trunk-code-quality |
-| Node | matches CI | practices/conventional-commits (commitlint), interface/openapi (Spectral) |
+| Tool      | Version                          | Layer / spec                                                                      |
+| --------- | -------------------------------- | --------------------------------------------------------------------------------- |
+| uv        | ≥ 0.4.27                         | platform/uv (PEP 735 `[dependency-groups]` support; older uv silently drops them) |
+| Python    | matches `.python-version`        | language/python                                                                   |
+| Docker    | 23+ (BuildKit)                   | delivery/docker, delivery/docker-compose, quality/integration-testing             |
+| Trunk CLI | as pinned in `.trunk/trunk.yaml` | quality/trunk-code-quality                                                        |
+| Node      | matches CI                       | practices/conventional-commits (commitlint), interface/openapi (Spectral)         |
 
 Run from the stack root.
 
 ## Procedure
 
-Each gate names *what it verifies* (which layer-spec rule), then shows the concrete command for this stack. Stop on first failure; do not skip ahead.
+Each gate names _what it verifies_ (which layer-spec rule), then shows the concrete command for this stack. Stop on first failure; do not skip ahead.
 
 ### 1. Lockfile resolves (platform layer)
 
@@ -147,7 +147,7 @@ docker compose ps
 
 **Verifies:** every BDR's acceptance scenarios pass against the running artifact (bdr rule 9: Given/When/Then scenarios drop directly into smoke tests).
 
-For each BDR in `docs/bdr/`, exercise its scenarios. For *this* stack, BDR-001 covers `POST /v1/greetings`:
+For each BDR in `docs/bdr/`, exercise its scenarios. For _this_ stack, BDR-001 covers `POST /v1/greetings`:
 
 ```bash
 curl -s http://127.0.0.1:8000/health
@@ -242,7 +242,7 @@ curl -fsSL "https://github.com/astral-sh/uv/releases/download/0.5.11/uv-aarch64-
 
 **Cause:** the Dockerfile installs the project before copying every file the build backend needs (typically `README.md`, `LICENSE`).
 
-**Fix:** copy the metadata files alongside `pyproject.toml` / `package.json` *before* the install step that resolves the local project.
+**Fix:** copy the metadata files alongside `pyproject.toml` / `package.json` _before_ the install step that resolves the local project.
 
 #### Unified lint runner's bundled type checker fails on every file
 
@@ -260,7 +260,7 @@ curl -fsSL "https://github.com/astral-sh/uv/releases/download/0.5.11/uv-aarch64-
 
 **Cause:** policy scanners (checkov, conftest, regula) ship default rules that assume every API has authentication and every array has `maxItems`. Reference scaffolds with no auth fail those rules trivially.
 
-**Fix:** scope-ignore the policy scanner on the OAD file *and* add a follow-up BDR to introduce the missing surface (auth, pagination limits) before the stack ships a real service.
+**Fix:** scope-ignore the policy scanner on the OAD file _and_ add a follow-up BDR to introduce the missing surface (auth, pagination limits) before the stack ships a real service.
 
 ### python-uv specific
 

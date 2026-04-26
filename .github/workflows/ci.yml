@@ -13,7 +13,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  UV_VERSION: "0.5.11"
+  UV_VERSION: "0.11.7"
   PYTHON_VERSION: "3.12"
 
 jobs:
@@ -69,7 +69,7 @@ jobs:
       - run: uv sync --locked --group dev
       - name: Install pinned prek
         # ADR-018 / prek rule 2 — pin the CLI version on every CI run.
-        run: uv tool install prek==0.0.6
+        run: uv tool install prek==0.3.10
       - name: Cache prek hook envs
         # prek rule 13 — key on the config file.
         uses: actions/cache@v4
@@ -127,7 +127,7 @@ jobs:
         with:
           node-version: "22"
       - name: Install Spectral
-        run: npm install --no-save @stoplight/spectral-cli@6.14.2
+        run: npm install --no-save @stoplight/spectral-cli@6.15.0
       - name: Lint openapi.yaml
         run: npx spectral lint openapi.yaml --fail-severity=warn
       - name: Install oasdiff
@@ -190,7 +190,7 @@ jobs:
           name: sbom-${{ github.sha }}
           path: sbom.cdx.json
       - name: Trivy vulnerability scan
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@0.36.0
         with:
           image-ref: python-uv-app:${{ github.sha }}
           severity: CRITICAL,HIGH

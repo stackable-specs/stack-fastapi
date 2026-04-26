@@ -147,6 +147,6 @@ def shutdown_telemetry(providers: TelemetryProviders | None) -> None:
     """Flush + dispose providers (opentelemetry rule 18)."""
     if providers is None:
         return
-    providers.tracer_provider.shutdown()  # type: ignore[no-untyped-call]
+    providers.tracer_provider.shutdown()
     providers.meter_provider.shutdown()
-    providers.logger_provider.shutdown()  # type: ignore[no-untyped-call]
+    providers.logger_provider.shutdown()

@@ -32,7 +32,7 @@ fmt: ## Format all files via trunk (invoked through prek for hook runs).
 
 .PHONY: prek-install
 prek-install: ## Install prek git hooks for this repo (ADR-018, prek rule 4).
-	prek install --install-hooks
+	prek install --prepare-hooks
 	prek install --hook-type commit-msg
 	prek install --hook-type pre-push
 

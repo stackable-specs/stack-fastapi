@@ -60,7 +60,7 @@ if have_tools npx; then
 		ruleset_args="--ruleset $(printf 'extends: ["spectral:oas"]' | python3 -c "import sys,tempfile; f=tempfile.NamedTemporaryFile(mode='w',suffix='.yaml',delete=False); f.write(sys.stdin.read()); f.close(); print(f.name)")"
 	fi
 	# shellcheck disable=SC2086
-	run_cmd SP_OUT SP_ERR SP_CODE -- npx --yes -- @stoplight/spectral-cli@6.14.2 lint openapi.yaml $ruleset_args --fail-severity=error
+	run_cmd SP_OUT SP_ERR SP_CODE -- npx --yes -- @stoplight/spectral-cli@6.15.0 lint openapi.yaml $ruleset_args --fail-severity=error
 	check "spectral lint exits 0" "$SP_CODE" \
 		"$(printf '%s\n%s' "$SP_OUT" "$SP_ERR" | tail -c 300 | tr '\n' ' ')"
 else

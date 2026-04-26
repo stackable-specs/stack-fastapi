@@ -4,8 +4,8 @@ Numbered, executable runbooks for recurring stack-level operations. Each SOP nam
 
 ## Index
 
-| SOP | Title | When to run |
-| --- | --- | --- |
+| SOP                            | Title                       | When to run                                                            |
+| ------------------------------ | --------------------------- | ---------------------------------------------------------------------- |
 | [SOP-001](001-verify-stack.md) | Verify the stack end-to-end | After scaffolding, tooling upgrades, major dep bumps, before a release |
 
 ## Authoring

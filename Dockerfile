@@ -26,7 +26,7 @@ FROM python:${PYTHON_TAG} AS builder
 WORKDIR /app
 
 # Install uv at a pinned version (uv rule 1: do not curl|sh unpinned).
-ARG UV_VERSION=0.5.11
+ARG UV_VERSION=0.11.7
 ENV UV_LINK_MODE=copy \
     UV_NO_PROGRESS=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1
