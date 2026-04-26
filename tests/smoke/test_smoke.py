@@ -22,10 +22,10 @@ def test_health_endpoint_returns_ok(smoke_client: httpx.Client) -> None:
 
 
 def test_greetings_endpoint_responds(smoke_client: httpx.Client) -> None:
-    """Primary API responds to a representative request (rule 2: critical path)."""
-    response = smoke_client.get("/greetings/world")
-    assert response.status_code == 200
-    assert "message" in response.json()
+    """BDR-001 happy path: POST /v1/greetings returns the rendered message."""
+    response = smoke_client.post("/v1/greetings", json={"name": "smoke"})
+    assert response.status_code == 201
+    assert response.json() == {"message": "Hello, smoke!"}
 
 
 def test_openapi_document_is_served(smoke_client: httpx.Client) -> None:
